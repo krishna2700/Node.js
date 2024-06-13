@@ -1,0 +1,16 @@
+{
+  "name": "middlewares",
+  "version": "1.0.0",
+  "description": "Middlewear",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "nodemon": "nodemon server.js"
+
+  },
+  "author": "Krishna",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.1.3"
+  }
+}
