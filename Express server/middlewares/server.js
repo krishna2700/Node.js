@@ -1,98 +1,45 @@
 const express = require("express");
 const app = express();
-const PORT = 8082;
+const PORT = 3690;
 
-//?----BUILT-IN-MIDDLEWARES----
-//serve static files
-// app.use(express.static())
-//!pass incoming data
-// app.use(express.json());
-// app.use(express.urlencoded())
+// * Serve static files
+// app.use(express.static());
+// !Pass incoming data
+app.use(express.json());
+app.use(express.urlencoded());
 
-//?----APP-LEVEL-MIDDLEWARES----
-//Logging details of every request
-// const logRequest = (req, res, next) => {
-//   console.log(
-//     `Request received at: ${new Date().toISOString()} for ${req.method} to ${
-//       req.path
-//     }`
-//   );
-//   //call next
-//   next();
-// };
-// app.use(logRequest);
+// ? Application level middleware
 
-// // Home Route
-// app.get("/", (req, res) => {
-//   console.log(req.body);
-//   res.json({
-//     message: "Welcome to this app",
-//   });
-// });
-// // Create a book
-// app.post("/books", (req, res) => {
-//   console.log(req.body);
-//   res.json({
-//     message: "Built in middlewares demo",
-//   });
-// });
+// * Logging details of every reques
 
-// !----ROUTER LEVEL MIDDLEWARE---
-// app.use("/users", (req, res, next) => {
-//   console.log("Middleware specific to paths with /users executed");
-//   next();
-// });
-// //* Home route
-// app.get("/", (req, res) => {
-//   res.json({
-//     message: "Welcome to router level middleware",
-//   });
-// });
-// //Profile route
-// app.get("/profile", (req, res) => {
-//   res.json({
-//     message: "This is a profile route",
-//   });
-// });
-// //Settings route
-// app.get("/settings", (req, res) => {
-//   res.json({
-//     message: "This is a profile route",
-//   });
-// });
-// //get all users route
-// app.get("/users", (req, res) => {
-//   res.json({
-//     message: "Get all users route",
-//   });
-// });
-// //Register users route
-// app.post("/users/register", (req, res) => {
-//   res.json({
-//     message: "Get all users route",
-//   });
-// });
-// //Login users route
-// app.post("/users/login", (req, res) => {
-//   res.json({
-//     message: "Login Route",
-//   });
-// });
+const logRequest = (req, res, next) => {
+  console.log(
+    `Request Recieved at: ${new Date().toISOString()} for ${req.method} ${
+      req.path
+    }`
+  );
+  console.log("Am a Application");
+  next();
+};
 
-// !----ERROR-HANDLING MIDDLEWARE---
-app.get("/cause-error", (req, res, next) => {
-  const error = new Error("Login failed");
-  next(error);
-});
+app.use(logRequest);
+//  Home Route
 
-//error handling middleware
-app.use((error, req, res, next) => {
-  console.log(error);
+app.get("/books", (req, res) => {
+  console.log(req.body);
   res.json({
-    status: "error",
-    message: error.message,
+    message: "Welcome to this App",
+  });
+});
+//  Create a book
+
+app.post("/books", (req, res) => {
+  console.log(req.body);
+  res.json({
+    message: "Book created successfully",
   });
 });
 
-//start the server
-app.listen(PORT, console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`The server is running on http://localhost:${PORT}`);
+});
