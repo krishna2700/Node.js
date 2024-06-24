@@ -7,25 +7,26 @@ const PORT = 3690;
 // Serve the static files/folder
 app.use(express.static(path.join(__dirname, "public")));
 console.log(__dirname);
-
+//  Set the view enjine to ejs
+app.set("view engine", "ejs");
 // Home route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "home.html"));
+  res.render("home.ejs");
 });
 
 // About route
 app.get("/about", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "about.html"));
+  res.render("about.ejs");
 });
 
 // Contact route
 app.get("/contact", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "contact.html"));
+  res.render("contact.ejs");
 });
 
 // Gallery route
 app.get("/gallery", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "gallery.html"));
+  res.render("gallery.ejs");
 });
 
 app.listen(PORT, () => {
