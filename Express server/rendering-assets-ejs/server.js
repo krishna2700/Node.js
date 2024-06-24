@@ -29,6 +29,18 @@ app.get("/gallery", (req, res) => {
   res.render("gallery.ejs");
 });
 
+// resnder userData route
+app.get("/users", (req, res) => {
+  // Dummy user content
+  const uderData = {
+    userName: "Krishna",
+    age: "23",
+    isPremeium: true,
+    email: "krishna@gmail.com",
+  };
+  res.render("userData.ejs", uderData);
+});
+
 app.listen(PORT, () => {
   console.log(`The server is running on http://localhost:${PORT}`);
 });
