@@ -11,22 +11,22 @@ console.log(__dirname);
 app.set("view engine", "ejs");
 // Home route
 app.get("/", (req, res) => {
-  res.render("home.ejs");
+  res.render("home");
 });
 
 // About route
 app.get("/about", (req, res) => {
-  res.render("about.ejs");
+  res.render("about");
 });
 
 // Contact route
 app.get("/contact", (req, res) => {
-  res.render("contact.ejs");
+  res.render("contact");
 });
 
 // Gallery route
 app.get("/gallery", (req, res) => {
-  res.render("gallery.ejs");
+  res.render("gallery");
 });
 
 // resnder userData route
@@ -37,6 +37,7 @@ app.get("/users", (req, res) => {
     age: "23",
     isPremeium: true,
     email: "krishna@gmail.com",
+    isLogin: true,
   };
   res.render("userData.ejs", uderData);
 });

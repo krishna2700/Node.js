@@ -10,7 +10,12 @@
     <!-- Accessing data from server -->
     <h1>Welcome <%= userName %></h1>
     <h1><%= age %></h1>
-    <h1><%= isPremeium %></h1>
     <h1><%= email %></h1>
+    <% if (isPremeium) { %>
+    <h1>Premium User</h1>
+    <% }else{ %>
+    <h1>Normal User</h1>
+    <%} %>
+    <h1><%= (isLogin)?"Login":"Logout" %></h1>
   </body>
 </html>
