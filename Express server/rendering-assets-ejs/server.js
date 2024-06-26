@@ -6,9 +6,10 @@ const PORT = 3690;
 
 // Serve the static files/folder
 app.use(express.static(path.join(__dirname, "public")));
-console.log(__dirname);
-//  Set the view enjine to ejs
+
+// Set the view engine to EJS
 app.set("view engine", "ejs");
+
 // Home route
 app.get("/", (req, res) => {
   res.render("home");
@@ -29,17 +30,28 @@ app.get("/gallery", (req, res) => {
   res.render("gallery");
 });
 
-// resnder userData route
+// Render userData route
 app.get("/users", (req, res) => {
   // Dummy user content
-  const uderData = {
+  const userData = {
     userName: "Krishna",
     age: "23",
-    isPremeium: true,
+    isPremium: true,
     email: "krishna@gmail.com",
     isLogin: true,
   };
-  res.render("userData.ejs", uderData);
+  res.render("userData", userData);
+});
+
+// Render Product page/route
+app.get("/products", (req, res) => {
+  const products = [
+    { name: "Laptop", price: 999 },
+    { name: "Mobile", price: 1999 },
+    { name: "Watch", price: 1200 },
+  ];
+  console.log("Rendering products page with:", products);
+  res.render("products", { products });
 });
 
 app.listen(PORT, () => {
