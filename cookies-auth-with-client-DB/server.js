@@ -1,142 +1,151 @@
 const express = require("express");
-const app = express();
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const app = express();
 
-const PORT = 3690;
-
-app.listen(PORT, () => {
-  console.log(`The server is running on http://localhost:${PORT}`);
-});
-
-// Connect to MongoDB
-
+//Connect to mongoose
 mongoose
   .connect(
     "mongodb+srv://krishnaruparelia0207:DxrcAvKIvk5KgRpU@krishnagettingstarted.eqdddjp.mongodb.net/userAuthDB"
   )
   .then(() => {
-    console.log("Connected to MongoDB");
+    console.log("DB has been connected");
   })
-  .catch((err) => {
-    console.log(err);
+  .catch((e) => {
+    console.log(e);
   });
-
-//  Create the userSchema
-
+//Create the userSchema
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   role: {
     type: String,
-    default: "User",
+    default: "user",
   },
 });
-
-// complile the Schema to form model
-
+//Compile the schema to form model
 const User = mongoose.model("User", userSchema);
 
-//  ! Middlewares
-
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
+//!Middlewares
+app.use(express.urlencoded({ extended: true }));
+//!Set the view engine
+app.set("view engine", "ejs");
 app.use(cookieParser());
 
-// !set the view engine
-app.set("view engine", "ejs");
+//-----CUSTOM MIDDLEWARES-----
+//!--isAuthenticated (Authentication)
+const isAuthenticated = (req, res, next) => {
+  //Check the user in the cookies
+  const userDataCookie = req.cookies.userData;
+  try {
+    const userData = userDataCookie && JSON.parse(userDataCookie);
+    if (userData && userData.username) {
+      //!Add the login user into the req object
+      req.userData = userData;
+      return next();
+    } else {
+      res.send("You are not login");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+//!-isAdmin (Authorization)
+const isAdmin = (req, res, next) => {
+  if (req.userData && req.userData.role === "admin") {
+    return next();
+  } else {
+    res.send("Fobidden: You do not have access, admin only");
+  }
+};
 
-// Home route
-
+//Home Route
 app.get("/", (req, res) => {
   res.render("home");
 });
-
-// Login route
-
+//Login Route (login form)
 app.get("/login", (req, res) => {
   res.render("login");
 });
 
-//  Register route
+//Admin Route (Admin page)
+app.get("/admin-only", isAuthenticated, isAdmin, (req, res) => {
+  //we have access to the login as req.userData
+  // console.log(req.userData);
+  res.render("admin");
+});
+//Register Route (register form)
 app.get("/register", (req, res) => {
   res.render("register");
 });
 
-//  Register Logic
+//Register Logic (register form)
 app.post("/register", async (req, res) => {
-  // ! Destructure the req.body
+  //!Destructure the req.body
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  // ! Create a new user
-  try {
-    const newUser = await new User({
-      username,
-      password: hashedPassword,
-    });
-    console.log(newUser);
-    newUser.save();
-    res.redirect("/login");
-  } catch (err) {
-    console.log(err);
-  }
+  await User.create({
+    username,
+    password: hashedPassword,
+  });
+  //Redirect to login
+  res.redirect("/login");
 });
 
-// Login post route
+//Login Route logic
 app.post("/login", async (req, res) => {
-  try {
-    // Destructure the req.body
-    const { username, password } = req.body;
-
-    // Find the user by username
-    const userFound = await User.findOne({ username });
-
-    // Check if user was found and password is correct
-    if (userFound && (await bcrypt.compare(password, userFound.password))) {
-      // Create some cookies (cookie)
-      res.cookie("userData", JSON.stringify(userFound), {
-        maxAge: 3 * 24 * 60 * 1000, // 3 days
+  const { username, password } = req.body;
+  //!. Find the user in the db
+  const userFound = await User.findOne({
+    username,
+  });
+  if (userFound && (await bcrypt.compare(password, userFound.password))) {
+    //! Create some cookies (cookie);
+    //* Prepare the login user data
+    //? Setting the cookie with the userdata
+    res.cookie(
+      "userData",
+      JSON.stringify({
+        username: userFound.username,
+        role: userFound.role,
+      }),
+      {
+        maxAge: 3 * 24 * 60 * 1000, //3days expiration
         httpOnly: true,
         secure: false,
         sameSite: "strict",
-      });
-
-      // Render the user Dashboard
-      res.redirect("/dashboard");
-    } else {
-      res.send("Login Failed");
-      res.redirect("/login");
-    }
-  } catch (err) {
-    console.log(err);
-    res.redirect("/login");
+      }
+    );
+    res.redirect("/dashboard");
+  } else {
+    res.send("Invalid login credentials");
   }
 });
 
-// Dashboard route
-
+//Dashboard Route
 app.get("/dashboard", (req, res) => {
-  // ! grab the users from the cookie
+  //! Grab the user from the cookie
   const userData = req.cookies.userData
     ? JSON.parse(req.cookies.userData)
     : null;
   const username = userData ? userData.username : null;
-  //   ! Render the templeate
+  //! Render the template
   if (username) {
-    return res.render("dashboard", { username });
+    res.render("dashboard", { username });
   } else {
-    // ! or redirect to login
-    return res.redirect("/login");
+    //!Redirect to login
+    res.redirect("/login");
   }
 });
 
-// Logout route
-
+//Logout Route
 app.get("/logout", (req, res) => {
+  //!Logout
   res.clearCookie("userData");
+  //redirect
   res.redirect("/login");
 });
+
+//start the server
+app.listen(3000, console.log("The server is running"));
