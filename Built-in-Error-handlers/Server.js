@@ -23,6 +23,17 @@ app.get("/", (req, res) => {
   });
 });
 
+// Custom Error handling middleware
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  //  * Setting the HTTP Status
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    stack: err.stack,
+  });
+});
+
 // Start the server
 
 app.listen(PORT, () => {
